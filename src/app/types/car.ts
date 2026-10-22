@@ -6,7 +6,4 @@ export type Car = {
     price: number;
     image: string;
     description: string;
-    isAvailable: boolean;
-    isFeatured: boolean;
-    isNew: boolean;
 }

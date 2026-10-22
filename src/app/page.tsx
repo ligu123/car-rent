@@ -11,7 +11,7 @@ export default function Home() {
         </div>
         <div className="max-w-6xl grid grid-cols-5 flex-1 items-center">
         {cars.map((car) => (
-          <Card key={car.id} brand={car.brand} model={car.model} year={car.year} price={car.price} description={car.description} image={car.image} />
+          <Card brand={car.brand} model={car.model} year={car.year} price={car.price} description={car.description} image={car.image} />
         ))}
         </div>
       </main>

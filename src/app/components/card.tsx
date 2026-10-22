@@ -6,7 +6,6 @@ export default function Card({brand, model, year, price, description, image}: {b
         <div className="flex h-full w-full flex-col gap-1 p-2 transition-all duration-300">
           <img
             src={image}
-            alt={brand}
             className="aspect-7/6 w-full rounded-3xl object-cover"
           />
           <div className="flex h-full w-full flex-col p-1.5 gap-1 text-text-primary">
