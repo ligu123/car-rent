@@ -1,8 +1,30 @@
 @import "tailwindcss";
 
+/* Stripe-inspired palette: white canvas, navy type, purple accent */
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1f36;
+
+  --primary: #635bff;
+  --secondary: #0a2540;
+  --success: #24b47e;
+  --danger: #df1b41;
+  --warning: #f5be0a;
+  --info: #0073e6;
+
+  --light: #f6f9fc;
+  --dark: #0a2540;
+  --muted: #6a7383;
+  --subtle: #f6f9fc;
+  --border: #e3e8ee;
+
+  --button-foreground: #ffffff;
+  --card: #f6f9fc;
+  --card-foreground: #1a1f36;
+  --card-border: #e3e8ee;
+  --card-background: #ffffff;
+  --text-primary: #1a1f36;
 }
 
 @theme inline {
@@ -10,13 +32,23 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-light: var(--light);
+  --color-dark: var(--dark);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-border: var(--border);
+  --color-button-foreground: var(--button-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+  --color-card-background: var(--card-background);
+  --color-text-primary: var(--text-primary);
 }
 
 body {
