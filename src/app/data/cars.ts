@@ -8,9 +8,6 @@ export const cars: Car[]= [
     price: 10000,
     image: "/cars/toyota.jpg",
     description: "A dependable compact sedan with low running costs, easy to park, and comfortable for daily commutes.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "2",
     brand:"Ford",
@@ -19,9 +16,6 @@ export const cars: Car[]= [
     price: 20000,
     image: "/cars/ford.jpg",
     description: "A classic American muscle coupe with strong acceleration and a weekend-ready driving feel.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 } 
 , { id: "3",
     brand:"Chevrolet",
@@ -30,9 +24,6 @@ export const cars: Car[]= [
     price: 30000,
     image: "/cars/chevrolet.jpg",
     description: "A bold sports coupe built for open roads, with sharp styling and plenty of power on tap.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "4",
     brand:"Audi",
@@ -41,9 +32,6 @@ export const cars: Car[]= [
     price: 40000,
     image: "/cars/audi.jpg",
     description: "A refined executive sedan with a quiet cabin, tight handling, and a premium interior finish.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "5",
     brand:"BMW",
@@ -52,9 +40,6 @@ export const cars: Car[]= [
     price: 50000,
     image: "/cars/bmw.jpg",
     description: "A spacious luxury SUV that mixes comfort on long trips with confident performance on the highway.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "6",
     brand:"Mercedes",
@@ -63,9 +48,6 @@ export const cars: Car[]= [
     price: 60000,
     image: "/cars/mercedes.jpg",
     description: "An elegant compact sedan with a smooth ride, upscale materials, and a calm, composed drive.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "7",  
     brand:"Nissan",
@@ -74,9 +56,6 @@ export const cars: Car[]= [
     price: 70000,
     image: "/cars/nissan.jpg",
     description: "A roomy midsize sedan with a comfortable cabin and a straightforward setup for city and highway miles.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "8",
     brand:"Hyundai",
@@ -85,9 +64,6 @@ export const cars: Car[]= [
     price: 80000,
     image: "/cars/hyundai.jpg",
     description: "A stylish compact sedan with modern tech, efficient fuel use, and a surprisingly quiet ride.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "9",
     brand:"Kia",
@@ -96,9 +72,6 @@ export const cars: Car[]= [
     price: 90000,
     image: "/cars/kia.jpg",
     description: "A versatile family SUV with three rows of space, easy loading, and a high, comfortable seating position.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }  
 , { id: "10",
     brand:"Volkswagen",
@@ -107,9 +80,6 @@ export const cars: Car[]= [
     price: 100000,
     image: "/cars/volkswagen.jpg",
     description: "A compact hatchback that feels tidy in town, with a practical cargo area and a planted, fun drive.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 , { id: "11",
     brand:"Porsche",
@@ -118,8 +88,5 @@ export const cars: Car[]= [
     price: 110000,
     image: "/cars/porsche.jpg",
     description: "An iconic sports car with precise steering, strong pace, and a cabin focused on the drive.",
-    isAvailable: true,
-    isFeatured: true,
-    isNew: true,
 }
 ] as Car[];
