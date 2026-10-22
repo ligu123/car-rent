@@ -28,7 +28,7 @@ export default function Home() {
           <h1 className="text-2xl font-medium">Featured Cars</h1>
           <p className="text-xl text-[#666666]">{cars.length} cars</p>
         </div>
-        <div className="max-w-6xl grid grid-cols-5 flex-1 items-center">
+        <div className="max-w-5xl grid grid-cols-5 flex-1 items-center">
           {cardList}
         </div>
       </main>

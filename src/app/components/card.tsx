@@ -11,16 +11,16 @@ export default function Card({brand, model, year, price, description, image}: {b
           <div className="flex h-full w-full flex-col p-1.5 gap-1 text-text-primary">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
-                <h3 className="text-base font-medium">{brand}</h3>
-                <div className="flex flex-row gap-3 text-sm text-[#666666]">
+                <h3 className="text-md font-medium">{brand}</h3>
+                <div className="flex flex-row gap-2 text-sm text-[#666666]">
                   <p>{model}</p>
                   <p>{year}</p>
                 </div>
               </div>
               <Button />
             </div>
-            <p className="flex items-center text-xl font-medium text-primary">
-              <DollarSign className="h-4 w-4" />
+            <p className="flex items-center text-md font-medium text-primary">
+              <DollarSign className="h-3.5 w-3.5" />
               {price}
             </p>
           </div>
