@@ -12,9 +12,11 @@ I created two components: `Button` and `Card`.
 
 The `Button` component is currently used only as an icon-only button within the cards. But we can potentially expand that in the future for further use cases.
 
-`Card` is the main component for presenting car information. It defines the card’s structure and accepts children, allowing the page to populate those children with car data when rendering each card.
+`Card` is the main component for presenting car information. It defines the card’s structure and accepts "props"(I mistaken it with "children"), allowing the page to populate the fields with car data when rendering each card.
 
-Although `Card` does not import `cars.ts` directly, I still needed to define each of its child content, so it's easier to be aligned with the actual card model, when rendering in the page.tsx.
+Because the Car type is defined in car.ts, I don't actually have to redefine every field in the card component again, but instead jsut import the Car types, and use car.props to fill in the specific fields. That actually makes the code cleaner.
+
+A note to myself: children is the prop that holds nested content. That's why I confused it with the concept of prop, cos they do have similarities.
 
 ### Page rendering
 

@@ -5,5 +5,6 @@ export type Car = {
     year: number;
     price: number;
     image: string;
+    imageAlt: string;
     description: string;
 }
