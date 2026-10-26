@@ -11,11 +11,13 @@ export default function Home()
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
 
+  const searchQuery = search.trim().toLowerCase();
+
   const filteredCars = cars.filter((carsData) => 
     (brand === "" ? true : carsData.brand === brand) &&
-    (carsData.brand.toLowerCase().includes( search.toLowerCase() ) || 
-     carsData.model.toLowerCase().includes( search.toLowerCase() ) || 
-     carsData.year.toString().includes( search.toString() )
+    (carsData.brand.toLowerCase().includes(searchQuery) || 
+     carsData.model.toLowerCase().includes(searchQuery) || 
+     carsData.year.toString().includes(searchQuery)
     ));
 
   return (
