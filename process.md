@@ -55,3 +55,43 @@ I did't not create the car detail page, as I think that is also not in the scope
 I wrote the application code myself in Cursor and defined the car data model myself. When I encountered unfamiliar concepts, I used Cursor’s AI in Ask mode to ask questions and improve my understanding.
 
 I used AI to generate the global CSS and the sample car records based on my data model. This saved me from manually defining every color and shared style or writing repetitive data entries.
+
+----------------------------------------------------------------
+
+### Task 2
+
+### Planning of the filtering feature
+
+What comes into my mind immediately is a search bar and a dropdown menu as filter. The search bar is for a direct matching of key words. The filter can filter the cars in display by different features available in the data type.
+
+On the primise that we're displaying all the car data in the page.tsx, no API connection required, I think it's better to do the filtering logic right in page.tsx. When we have more car available, we might need things like pagination, a search and filtering API etc.
+
+### The actual coding of the filtering feature
+
+I added a search bar, to search any traits of the car data type, including the brand, the model, and the year.
+I also added a brand filter which filters the cars by brand only. I could add the model and year filter, and even add a price slider, but think that's just not 100% for the purpose of this task.
+
+To make the feature look decent, I also added a .length to the page, so that when filtered, we can also easily find out how many cars are left after filtering. Same I added an empty state.
+
+### The learning during the coding of this feature
+
+The part that was most struggling for me is not the useState logic, which I have actually had some understanding before. What I struggled most at first is the default HTML Attributes of dropdown and input, e.g. the onChange method, the <option> item. Once I figure out how the components work in HTML logic, things get easier for me to understand.
+
+So how does the whole filtering work?
+
+user input the data/select the option, the HTML captures these changes, and pass them down to the component. The component then pass down that new change/event to the page.tsx, and then call useState to update the actual page. 
+Meanwhile, in parallel, the .map method captures the event change from the input and dropdown, to update the carList that is rendered.
+
+What I think is quite elegant for the current code:
+  1. the filteredCars method collects all the filtering logic within 1 variable, nesting both the search and dropdown filtering logic.
+  2. the filteredCars method is then passed down to the .map method, and all the carList changes are rendered. Regardless of it coming from the input or the dropdown.
+  3. it's interesting to learn about:
+    A. a series of default JS method: 
+      .filter; 
+      .toLowerCase(); 
+      .includes();
+    B. the ?...: grammar, as an replacement of if...else. I tried to use if...else in the <div/>, and turns out it doesn't work as I expected. So the ?...: grammar is better for when nested in a <div/>
+    C. a new usecase of .map: ```options={cars.map((carsData) => carsData.brand)}``` it is used here to render a new array list of brands to be rendered in the dropdown option. I was struggling with how to render a brand list in the dropdown, turns out .map could do this easily.
+    D. for the <select/> it automatically renders the .option and .target logic, without needing to write an onClick, which is not clear at first sight at all...
+
+I used AI the same way as I did last time.

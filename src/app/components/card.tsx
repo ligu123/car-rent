@@ -9,9 +9,9 @@ export default function Card({carsData}: {carsData: Car}) {
             className="aspect-7/6 w-full rounded-2xl object-cover"
           />
           <div className="flex h-full w-full flex-col p-1.5 gap-1 text-text-primary">
-                <h3 className="text-md font-medium">{carsData.brand}</h3>
+                <h3 className="text-md font-medium">{carsData.model}</h3>
                 <div className="flex flex-row items-center justify-start gap-3 text-sm text-[#666666]">
-                  <p>{carsData.model}</p>
+                  <p>{carsData.brand}</p>
                   <p>{carsData.year}</p>
                 </div>
             <p className="flex items-center text-md font-medium text-primary">
