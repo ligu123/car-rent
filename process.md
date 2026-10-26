@@ -95,3 +95,5 @@ What I think is quite elegant for the current code:
     D. for the <select/> it automatically renders the .option and .target logic, without needing to write an onClick, which is not clear at first sight at all...
 
 I used AI the same way as I did last time.
+
+lint and build checked, except for the old Next.js image issue, nothing else.
