@@ -3,9 +3,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Getting Started
 
 ```bash
-
 # First, clone the repo:
-git clone <https://github.com/ligu123/car-rent.git>
+git clone https://github.com/ligu123/car-rent.git
 
 # When you are in the terminal, make sure to:
 cd car-rent
@@ -14,6 +13,7 @@ cd car-rent
 npm install
 
 # After the dependencies are installed, then:
+```
 
 ```bash
 npm run dev
@@ -32,5 +32,5 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 npm run lint
 npm run build
 ## to make sure the code has no lint error, and the system is not only just running on localhost.
-
+```
 
