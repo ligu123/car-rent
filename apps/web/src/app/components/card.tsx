@@ -1,4 +1,4 @@
-import { Car } from "@/app/types/car";
+import { Car } from "@/packages/types/car";
 
 export default function Card({carsData}: {carsData: Car}) {
     return (

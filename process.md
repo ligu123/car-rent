@@ -58,7 +58,7 @@ I used AI to generate the global CSS and the sample car records based on my data
 
 ----------------------------------------------------------------
 
-### Task 2
+# Task 2
 
 ### Planning of the filtering feature
 
@@ -97,3 +97,106 @@ What I think is quite elegant for the current code:
 I used AI the same way as I did last time.
 
 lint and build checked, except for the old Next.js image issue, nothing else.
+
+
+----------------------------------------------------------------
+
+# Task 3
+
+### Initial plan, and what I changed
+
+The plan was to keep the UI as it was, move the car list onto a small Express API, and have `page.tsx` load cars over HTTP instead of importing `apps/web/src/app/data/cars.ts`.
+
+I kept that plan. What I changed along the way:
+1. I split the repo into different workspaces (`apps/web`, `apps/api`, `packages/types`) instead of leaving everything under one Next.js app.
+2. I moved the `Car` type into `packages/types/car.ts` so both apps import the same shape. Path alias: `@/packages/types/car`.
+3. `/cars/:id` first returned a missing car as `200` with `{}` or `car: null`. I changed it to `404` with `{ status: "error", message }`.
+4. The first frontend fetch only stored `cars`. Failed requests looked like an empty list "{ }" . I changed that to a `CarsRequest` union: loading / error / success.
+5. Search and brand filter stayed on the client. I did not add a search API.
+I kept the backend small on purpose: three GET routes, one data file, no database, no router folder.
+
+### Decisions
+**Backend files.** One Express entry file and one data file:
+- `apps/api/src/index.ts` — CORS, JSON parser, routes, listen on 4000
+- `apps/api/src/app/data/cars.ts` — the array type car data
+I did not add controllers or a routes folder. Three endpoints do not need that.
+**JSON responses.**
+- `GET /health` → `{ ok: true }`
+- `GET /cars` → `{ cars: [...] }`
+- `GET /cars/:id` success → `{ status: "success", car }`
+- `GET /cars/:id` missing → `404` `{ status: "error", message: "Car with id … not found" }`
+List and detail are not identical. The list is the homepage payload. Detail uses `status` so a missing id is obvious in curl and in a future detail page.
+
+**Where fetching lives.** In `apps/web/src/app/page.tsx` only. `loadCars` is a `useCallback`. `useEffect` runs it on demand. Cards, Input, and Dropdown stay as it was. No extra API client file.
+
+**Loading and error state.** One `request` state, with 3 variants, not 3 booleans, because the 3 states here are mutually exclusive, and it's hard to reflect the mutually exclusive logic with booleans:
+
+```ts
+type CarsRequest =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "success"; cars: Car[] };
+```
+
+- loading → “Loading cars…”
+- error → message + Try again (calls `loadCars` again)
+- success + no matches after filter → “No cars found”
+- success + `data.cars ?? []` so a missing `cars` field is an empty list, not a crash
+Filter state (`search`, `brand`) is separate from request state.
+
+**API address.** Hardcoded `http://localhost:4000` in `page.tsx`, port `4000` in `index.ts`, CORS origin `http://localhost:3000`. No `.env`. If a port changes, those three places have to change together. That is enough for local homework.
+
+### How a request moves from the frontend to Express and back
+1. The browser opens `http://localhost:3000`. Next.js serves the page.
+2. `useEffect` runs `loadCars`.
+3. `loadCars` sets `request` to loading, then `fetch("http://localhost:4000/cars")`.
+4. The browser sends a GET to Express on 4000. Origin is `http://localhost:3000`, so CORS must allow that origin or the browser blocks the response.
+5. Express matches `GET /cars`, reads the in-memory `cars` array, and `res.json({ cars })`.
+6. `fetch` gets the Response. If `!res.ok`, throw. Otherwise parse JSON and `setRequest({ status: "success", cars })`.
+7. Network failure (API stopped) goes to `.catch` and `status: "error"`.
+8. React re-renders. Search/brand `.filter` still runs only on the success list.
+`GET /cars/:id` is the same path, but `req.params.id` + `cars.find`. The homepage does not call it yet. I checked it with curl.
+
+### Loading, errors, and empty data
+| Case | What happens |
+| --- | --- |
+| First load / retry | `status: "loading"`, copy “Loading cars…” |
+| API down or HTTP error | `status: "error"`, message, Try again |
+| List arrives | `status: "success"`, cards + count |
+| Success but filters match nothing | same success state, “No cars found” |
+| Unknown id on `/cars/:id` | 404 JSON, not an empty 200 |
+Empty filter results are not treated as a fetch error. The request succeeded; the client filter is just strict.
+
+### What I found difficult
+1. I never knew the monorepo with both API and Web workspace architecture before. It took me a while to figure out what it is and how that works.
+2. It also took me a while to figure our the tsconfig across different workspaces.
+    
+    To share the `Car` type. The API `tsconfig` `paths` alias was wrong at first (`baseUrl` / too many `../`). Web already used `../../packages/types/car.ts`. Matching that, and dropping `rootDir` so a file outside `apps/api/src` is allowed, made the import work.
+3. I was also a bit struggle on how to set up different states in the frontend, from loading to error to empty etc.
+4. Also this task purely has more new knowledge for me compared with previous ones: with API, Portal, CORS, HTTPS, Req/Res, Listen, etc. I took some time to figure out how all the pieces come together.
+
+### Checks I performed
+- `npm install` at the repo root, then `npm run dev` (web 3000 + api 4000 via concurrently).
+- Browser: catalog loads from the API; search and brand filter still work; empty filter copy still shows.
+- Stop the API / fail `/cars`: error UI and Try again. Start the API again: retry works.
+- curl:
+  - `curl http://localhost:4000/health` → `{ "ok": true }`
+  - `curl http://localhost:4000/cars` → list
+  - `curl http://localhost:4000/cars/1` → one car
+  - `curl -i http://localhost:4000/cars/999` → `404` and `{ "status": "error", "message": "Car with id 999 not found" }`
+- Frontend lint/build: 
+    1. same Next.js image warning as before
+    2. `npx eslint src` in `apps/web` reports `react-hooks/set-state-in-effect` on `page.tsx`:
+      `useEffect` calls `loadCars()`, and `loadCars` immediately does `setRequest({ status: "loading" })`. The rule does not like `setState` at the start of an effect, because it causes an extra render.
+      
+      After investigation, I understand the warning. I did not change the code. The page already starts as `{ status: "loading" }`, and `loadCars` is also used by **Try again**, so I want one function for first load and retry. And this approach also keeps all the status from loading to error etc in one type function, so things are cleaner.
+      
+### AI use
+I used Cursor AI in Ask mode, same as Task 1 and 2. I wrote the Express routes, moved the data, and wired `fetch` myself.
+AI helped with:
+- Express + CORS setup
+- why `fetch` needs `res.ok`
+- the loading / error / success union instead of one `cars` array
+- `tsconfig` `paths` for `@/packages/types/car`
+- curl commands to prove 404
+How I checked suggestions: I did not paste blindly. I ran the server, used curl (`-i` for status codes), reloaded the browser, stopped port 4000 to see the error UI, then started the API again and used Try again. For the type alias I compared the API tsconfig with the web tsconfig and only kept the mapping that actually resolved.

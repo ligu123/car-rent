@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./apps/web/src/*"],
+      "@/packages/types/car": ["./packages/types/car.ts"]
     }
   },
   "include": [
