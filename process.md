@@ -199,4 +199,4 @@ AI helped with:
 - the loading / error / success union instead of one `cars` array
 - `tsconfig` `paths` for `@/packages/types/car`
 - curl commands to prove 404
-How I checked suggestions: I did not paste blindly. I ran the server, used curl (`-i` for status codes), reloaded the browser, stopped port 4000 to see the error UI, then started the API again and used Try again. For the type alias I compared the API tsconfig with the web tsconfig and only kept the mapping that actually resolved.
+How I checked suggestions: I did not paste blindly. I ran the server, used curl (`-i` for status codes), reloaded the browser, stopped port 4000 to see the error UI, then started the API again and used Try again.
