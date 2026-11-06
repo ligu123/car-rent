@@ -1,9 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import postgres from "postgres";
+import sql from "./db";
 
-const sql = postgres(process.env.DATABASE_URL!, { ssl: "require"});
 const app = express();
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
