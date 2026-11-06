@@ -42,8 +42,6 @@ app.get("/cars/:id", async (req,res) => {
     FROM cars
     WHERE id = ${id}
     `;
-
-
     if(!car) {
         res.status(404).json({
             status: "error", message: `Car with id ${id} not found`});
@@ -56,6 +54,16 @@ app.get("/cars/:id", async (req,res) => {
     }
 });
 
+
+app.get("/brands", async (req,res) => {
+    const brands = await sql`
+    SELECT brand
+    FROM cars
+    GROUP BY brand
+    ORDER BY brand ASC
+    `;
+    res.json({brands});
+});
 app.listen(4000,() => {
     console.log("Server is running on port 4000");
 });
