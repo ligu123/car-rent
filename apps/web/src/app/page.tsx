@@ -30,8 +30,10 @@ type CarsRequest =
        if (!res.ok) {
         throw new Error(`Could not load cars (${res.status})`);
        }
-       const data: { cars?: Car[]} = await res.json();
-       setRequest({ status: "success", cars: data.cars ?? [] });
+       else {
+        const data: { cars?: Car[]} = await res.json();
+        setRequest({ status: "success", cars: data.cars ?? [] });
+       }
       })
       .catch((error: unknown) => {
         const message =
@@ -40,9 +42,7 @@ type CarsRequest =
       });
   }, [search, brand]);
 
-  useEffect(() => {
-    loadCars();
-  }, [loadCars]);
+  useEffect(() => {loadCars();}, [loadCars]);
 
   const cars = request.status === "success" ? request.cars : [];
 
