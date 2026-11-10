@@ -5,6 +5,7 @@ import Dropdown from "./components/dropdown";
 import Button from "./components/button";
 import { useCallback, useEffect, useState } from "react";
 import type { Car } from "@/packages/types/car";
+import Link from "next/link";
 
 type CarsRequest =
   | { status: "loading" }
@@ -51,12 +52,15 @@ type CarsRequest =
   return (
     <div className="flex flex-1 flex-col items-center bg-background font-sans text-foreground">
       <main className="max-w-fit flex flex-col items-start gap-8 py-16 px-16">
-       
+
+       <div className="flex w-full items-center justify-between gap-3">
         <div className="flex flex-col gap-2 items-start pl-2">
            <h1 className="text-2xl font-medium">Featured Cars</h1>
            <p className="text-xl text-[#666666]">
              {request.status === "success" ? `${cars.length} cars` : "\u00a0"}
            </p>
+        </div>
+          <Link href="/managementpage">Manage cars</Link>
         </div>
 
         <div className="flex items-center gap-3 pl-2">
