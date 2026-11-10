@@ -6,6 +6,7 @@ import Button from "./components/button";
 import { useCallback, useEffect, useState } from "react";
 import type { Car } from "@/packages/types/car";
 import Link from "next/link";
+import { X } from "lucide-react";
 
 type CarsRequest =
   | { status: "loading" }
@@ -76,7 +77,10 @@ type CarsRequest =
           />
           <Button
              onClick={() => {setSearch(""); setBrand("");}}
-          />
+             icon={<X className="w-4 h-4" />}
+          >
+            Clear
+          </Button>
         </div>
 
         {request.status === "loading" ? (
