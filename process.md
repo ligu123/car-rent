@@ -200,3 +200,74 @@ AI helped with:
 - `tsconfig` `paths` for `@/packages/types/car`
 - curl commands to prove 404
 How I checked suggestions: I did not paste blindly. I ran the server, used curl (`-i` for status codes), reloaded the browser, stopped port 4000 to see the error UI, then started the API again and used Try again.
+
+
+# Task 4
+### Plan (before coding)
+The columns of the table will include: `id`/`brand`/`model`/`image`/`image_alt`/`description`/`year`/`price`
+
+The types and constraints will be:
+Table: `id` text primary key (old seed ids are `"1"`…`"34"`, new cars are UUIDs), `brand`/`model`/`image`/`image_alt`/`description` text NOT NULL, `year` integer with a range check, `price` numeric >= 0 (weekly). Image is a path or URL, not a file upload.
+
+Create the table and insert the original cars with SQL files (`apps/api/sql/create-cars.sql`, `seed-cars.sql`).
+
+Express connects through `DATABASE_URL` in `apps/api/.env`, `ssl: "require"`, pool in `apps/api/src/db.ts`, routes in `index.ts`.
+
+Search/brand go to the backend as GET query parameters (`URLSearchParams`). Create/edit send a JSON body. After a successful change the management page fetches `/cars` again.
+
+The management page will be a table of all the cars data, with optional form to create/edit/delete cars
+
+Failed requests: frontend validation on the form; backend validates independently (400 / 404 / 500). 500 logs the real error on the server and returns a generic JSON message.
+
+Data flow sketch:
+Browser (search state / form) → GET /cars?search=&brand= or POST/PATCH/DELETE /cars → Express (parameterised SQL) → Neon → JSON → setState / refetch list
+
+### Table design
+I used the same columns we already had in previous tasks. Because of the types we previously defined for the cars, I can actually use the same type for the db. In terms of constraints: I made sure NOT NULL is on every column, CHECK on year and price. No ORM; `postgres` tagged templates.
+
+### How requests move (React → Express → Neon)
+1. Homepage keeps `search` and `selectedBrand` in React state.
+2. When they change, `loadCars` builds query params and `fetch`es `http://localhost:4000/cars?...`.
+3. Express reads `req.query`, trims, and adds `ILIKE` / brand conditions in SQL. Empty strings are treated as no filter.
+4. Rows come from Neon. Express returns `{ cars }`. The homepage renders that list. There is no client-side `.filter` on cars anymore.
+5. Management page `POST`/`PATCH`/`DELETE` with a JSON body. After success it calls `loadCars()` again. Homepage brands load from `GET /brands` on mount.
+
+### Why search uses query parameters while create/edit use request bodies
+Overall query parameter is requesting the location of an object. While create/edit is not only pointing out the location of the object, but also clarifying what to be changed (which might be a long list of content), and thus cannot be hosted in a simple URL. so it's not simple query parameters.
+
+### How parameterised queries work
+A parameterised query sends the database an SQL template and the input values separately. It is used to avoid SQL injection.
+
+```bash
+db.query(
+  "SELECT * FROM cars WHERE brand = $1",
+  ["Toyota"]
+);
+```
+In the code here, the user's request is limited into the blank $1 field, so the database knows the query's supplied value is only viewed as data. Even if someone enters SQL code as the value, it stays text.
+
+### Validation and overlapping requests
+Frontend: `CarForm` checks required fields, year, and price, keeps the typed values if submit fails, shows Saving, and ignores a second submit while `saving` is true. Delete asks for confirmation; cancel does not call DELETE.
+Backend: `validateCarBody` for POST (all fields) and PATCH (only provided fields). Missing record → 404. Invalid input → 400. Database errors → 500 + `console.error`.
+Overlapping search: `loadID` is a `useRef` counter. Each `loadCars` does `++loadID.current`. When a response comes back, if `id !== loadID.current` it returns without `setRequest`. A slower older search cannot replace a newer one. Search is also debounced 300ms.
+
+### How the UI refreshes after changes
+Management does not keep a second copy of the truth. After create/edit/delete succeeds, it fetches `GET /cars` again. The public page gets the same rows from Neon the next time it loads. Seed SQL is not run by `npm run dev`, so restarting Express does not recreate deleted cars.
+
+### What I found difficult
+1. PATCH vs PUT: at first I didn't figure out the difference between PATCH and PUT. a full replace was wiping fields I did not send. I switched PATCH to a whitelist update.
+2. If brand options came from the filtered car list, searching would empty the dropdown. That is why `GET /brands` exists.
+3. Actually there're so many things I learned for the first time I couldn't even be able to list all of them, it's just a completely new world to me.
+
+### Checks I performed
+- Homepage loads from Neon through Express; search (case / spaces), brand, both together, Clear, empty result copy.
+- Brand dropdown still has options while a search is active.
+- Management: shared form for create and edit; delete confirm / cancel; saving and delete-in-progress copy; API error messages shown on the form.
+- curl-style API behaviour in the app: 201 create, PATCH, DELETE, 404 missing id, 400 invalid body, 500 generic message.
+- SQL files added so a fresh database can be created and seeded without `seed.ts`. The old in-memory `cars.ts` and `seed.ts` were removed.
+
+### AI assistance
+I used Cursor in both Ask and Agent mode. I wrote most of the routes and the management UI myself, then asked to explain PATCH, form state, overlapping requests, and the SQL files. Agent mode added the SQL files and deleted `seed.ts` / `cars.ts`.
+How I checked suggestions: did not paste blindly. I compared them with the homework text, ran the apps locally, used the management page in the browser, and checked that Express is not inserting seed data on boot. I left `/cars` (not `/api/cars`) on purpose after asking about it.
+
+

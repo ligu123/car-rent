@@ -3,7 +3,7 @@ import Card from "./components/card";
 import Input from "./components/input";
 import Dropdown from "./components/dropdown";
 import Button from "./components/button";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import type { Car } from "@/packages/types/car";
 import Link from "next/link";
 import { X } from "lucide-react";
@@ -17,14 +17,35 @@ type CarsRequest =
 {
   const [request, setRequest] = useState<CarsRequest>({ status: "loading" });
   const [search, setSearch] = useState("");
-  const [brand, setBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [brandOptions, setBrandOptions] = useState<string[]>([]);
+  const loadID = useRef(0);
+
+const loadBrands = useCallback(() => {
+  fetch("http://localhost:4000/brands")
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`Could not load brands (${res.status})`);
+      }
+      const data: { brands?: { brand: string }[] } = await res.json();
+      setBrandOptions((data.brands ?? []).map((row) => row.brand));
+    })
+    .catch((error: unknown) => {
+      console.error(error);
+    });
+}, []);
+
+useEffect(() => {
+  loadBrands();
+}, [loadBrands]);
 
   const loadCars = useCallback(() => {
+    const id = ++loadID.current;
     setRequest({ status: "loading" });
 
     const params = new URLSearchParams();
     if (search.trim()) params.set("search", search.trim());
-    if (brand.trim()) params.set("brand", brand.trim());
+    if (selectedBrand.trim()) params.set("brand", selectedBrand.trim());
     const qs = params.toString();
 
     fetch (`http://localhost:4000/cars${qs ? `?${qs}` : ""}`)
@@ -33,18 +54,23 @@ type CarsRequest =
         throw new Error(`Could not load cars (${res.status})`);
        }
        else {
+        if (id !== loadID.current) return;
         const data: { cars?: Car[]} = await res.json();
         setRequest({ status: "success", cars: data.cars ?? [] });
        }
       })
       .catch((error: unknown) => {
+        if (id !== loadID.current) return;
         const message =
           error instanceof Error ? error.message : "Could not load cars";
         setRequest({ status: "error", message });
       });
-  }, [search, brand]);
+  }, [search, selectedBrand]);
 
-  useEffect(() => {loadCars();}, [loadCars]);
+  useEffect(() => {
+    const t = setTimeout(() => loadCars(), 300);
+    return () => clearTimeout(t);
+  }, [loadCars]);
 
   const cars = request.status === "success" ? request.cars : [];
 
@@ -71,12 +97,12 @@ type CarsRequest =
              onSearch={(inputValue) => setSearch(inputValue)}
           />
           <Dropdown 
-             options={[...new Set(cars.map((carsData) => carsData.brand))]}
-             value={brand} 
-             onSelect={(selectedValue) => setBrand(selectedValue)}
+             options={brandOptions}
+             value={selectedBrand} 
+             onSelect={(selectedValue) => setSelectedBrand(selectedValue)}
           />
           <Button
-             onClick={() => {setSearch(""); setBrand("");}}
+             onClick={() => {setSearch(""); setSelectedBrand("");}}
              icon={<X className="w-4 h-4" />}
           >
             Clear
