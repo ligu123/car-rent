@@ -7,19 +7,44 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import type { Car } from "@/packages/types/car";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+
 
 type CarsRequest =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "success"; cars: Car[] };
 
-  export default function Home() 
+function Home() 
 {
   const [request, setRequest] = useState<CarsRequest>({ status: "loading" });
-  const [search, setSearch] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
   const [brandOptions, setBrandOptions] = useState<string[]>([]);
   const loadID = useRef(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const search = searchParams.get("search") ?? "";
+  const brand = searchParams.get("brand") ?? "";
+
+  function updateFilters(next: { search?: string; brand?: string }) {
+    const params = new URLSearchParams(searchParams.toString());
+  
+    const nextSearch = next.search ?? search;
+    const nextBrand = next.brand ?? brand;
+  
+    if (nextSearch.trim()) params.set("search", nextSearch.trim());
+    else params.delete("search");
+  
+    if (nextBrand.trim()) params.set("brand", nextBrand.trim());
+    else params.delete("brand");
+  
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
+
 
 const loadBrands = useCallback(() => {
   fetch("http://localhost:4000/brands")
@@ -45,7 +70,7 @@ useEffect(() => {
 
     const params = new URLSearchParams();
     if (search.trim()) params.set("search", search.trim());
-    if (selectedBrand.trim()) params.set("brand", selectedBrand.trim());
+    if (brand.trim()) params.set("brand", brand.trim());
     const qs = params.toString();
 
     fetch (`http://localhost:4000/cars${qs ? `?${qs}` : ""}`)
@@ -65,7 +90,7 @@ useEffect(() => {
           error instanceof Error ? error.message : "Could not load cars";
         setRequest({ status: "error", message });
       });
-  }, [search, selectedBrand]);
+  }, [search, brand]);
 
   useEffect(() => {
     const t = setTimeout(() => loadCars(), 300);
@@ -94,15 +119,15 @@ useEffect(() => {
           <Input 
              value={search}
              placeholder="Search for a car" 
-             onSearch={(inputValue) => setSearch(inputValue)}
+             onSearch={(inputValue) => updateFilters({search: inputValue})}
           />
           <Dropdown 
              options={brandOptions}
-             value={selectedBrand} 
-             onSelect={(selectedValue) => setSelectedBrand(selectedValue)}
+             value={brand} 
+             onSelect={(selectedValue) => updateFilters({brand: selectedValue})}
           />
           <Button
-             onClick={() => {setSearch(""); setSelectedBrand("");}}
+             onClick={() => updateFilters({search: "", brand: ""})}
              icon={<X className="w-4 h-4" />}
           >
             Clear
@@ -139,5 +164,13 @@ useEffect(() => {
 
       </main>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<p>Loading…</p>}>
+      <Home />
+    </Suspense>
   );
 }
